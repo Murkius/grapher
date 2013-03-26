@@ -84,8 +84,8 @@ void franciosa_propagate(deque<Edge> d) {
         franciosa_remove_all_pointing_to(d, min_edge.to);
         (*min_edge.to).parent = min_edge.from;
         
-        //TODO: pağalinti iğ ankstesnio tëvo vaikø sàrağo (tiksli pozicija neşinoma) 
-        // ir visus paskiau einanèius vaikus perkelti 1 vieta atgal - ëda per daug laiko
+        //TODO: paÅ¡alinti iÅ¡ ankstesnio tÄ—vo vaikÅ³ sÄ…raÅ¡o (tiksli pozicija neÅ¾inoma) 
+        // ir visus paskiau einanÄius vaikus perkelti 1 vieta atgal - Ä—da per daug laiko
         (*min_edge.from).children[(*min_edge.from).childNumber++] = min_edge.to;
         
         if((*min_edge.to).distance_to_source > (*min_edge.from).distance_to_source + 1){
@@ -104,8 +104,8 @@ void franciosa_propagate(deque<Edge> d) {
 void franciosa_insert(Edge e) {
     (*e.from).fs_size++;
     (*e.from).fs[(*e.from).fs_size] = e.to;
-    //TODO: Èia x turëtø bûti ádedamas á e.to.bs
-    if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: èia turëtø bûti lyginama pagal rank
+    //TODO: ÄŒia x turÄ—tÅ³ bÅ«ti Ä¯dedamas Ä¯ e.to.bs
+    if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: Äia turÄ—tÅ³ bÅ«ti lyginama pagal rank
         deque<Edge> d;
         d.push_front(e);
         franciosa_propagate(d);
@@ -128,7 +128,7 @@ string deque_of_edges_to_string(deque<Edge> d) {
 }
 string spTreeToString(struct Vertex source, int identLevel = 0) {
     /*
-        Eilutë gaminama remiantis Vertex.children masyvu;
+        EilutÄ— gaminama remiantis Vertex.children masyvu;
     */
     ostringstream content;
     for(int i = 0; i < identLevel; i++) {
@@ -142,7 +142,7 @@ string spTreeToString(struct Vertex source, int identLevel = 0) {
 }
 string spTreeToString2(struct Vertex graph[], int n) { 
     /*
-        Eilutë gaminama tik pagal Vertex.parent; remiasi prielaida, kad graph[0] yra source virğûnë
+        EilutÄ— gaminama tik pagal Vertex.parent; remiasi prielaida, kad graph[0] yra source virÅ¡Å«nÄ—
     */
     for(int i = 1; i < n; i++){
         if((*graph[i].parent).identifier == graph[i-1].identifier) {
