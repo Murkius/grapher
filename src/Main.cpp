@@ -57,7 +57,7 @@ void bfs(struct Vertex graph[], struct Vertex *source) {
 /* ---------------------- Franciosa (dynamic, for non weighted graphs) ------------------------ */
 Edge franciosa_edge_with_minimum_distance (deque<Edge> d) {
     deque<Edge>::iterator i = d.begin();
-    int min_distance = (*(*i).from).distance_to_source;
+    int min_distance = std::numeric_limits<int>::max();
     Edge min_distance_edge;
     
     while(i != d.end()) {
@@ -71,7 +71,7 @@ Edge franciosa_edge_with_minimum_distance (deque<Edge> d) {
 }
 void franciosa_remove_all_pointing_to(deque<Edge> &d, Vertex *v) {
     deque<Edge>::iterator i = d.begin();
-    while(i != d.end()) {
+    while(not d.empty() && i != d.end()) {
         if((*i).to == v) {
             d.erase(i);
         }
@@ -83,6 +83,11 @@ void franciosa_propagate(deque<Edge> d) {
         Edge min_edge = franciosa_edge_with_minimum_distance(d);
         franciosa_remove_all_pointing_to(d, min_edge.to);
         (*min_edge.to).parent = min_edge.from;
+        
+        //TODO: paðalinti ið ankstesnio tëvo vaikø sàraðo (tiksli pozicija neþinoma) 
+        // ir visus paskiau einanèius vaikus perkelti 1 vieta atgal - ëda per daug laiko
+        (*min_edge.from).children[(*min_edge.from).childNumber++] = min_edge.to;
+        
         if((*min_edge.to).distance_to_source > (*min_edge.from).distance_to_source + 1){
             (*min_edge.to).distance_to_source = (*min_edge.from).distance_to_source + 1;
             for(int i = 0; i < (*min_edge.to).fs_size; i++){
@@ -99,7 +104,7 @@ void franciosa_propagate(deque<Edge> d) {
 void franciosa_insert(Edge e) {
     (*e.from).fs_size++;
     (*e.from).fs[(*e.from).fs_size] = e.to;
-    cout << "Èia x turëtø bûti ádedama á y.bs\n"; //TODO:
+    //TODO: Èia x turëtø bûti ádedamas á e.to.bs
     if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: èia turëtø bûti lyginama pagal rank
         deque<Edge> d;
         d.push_front(e);
@@ -121,7 +126,10 @@ string deque_of_edges_to_string(deque<Edge> d) {
     }
     return content.str();
 }
-string spTreeToString(struct Vertex source, int identLevel) {
+string spTreeToString(struct Vertex source, int identLevel = 0) {
+    /*
+        Eilutë gaminama remiantis Vertex.children masyvu;
+    */
     ostringstream content;
     for(int i = 0; i < identLevel; i++) {
         content << " ";
@@ -132,30 +140,62 @@ string spTreeToString(struct Vertex source, int identLevel) {
     }
     return content.str();
 }
+string spTreeToString2(struct Vertex graph[], int n) { 
+    /*
+        Eilutë gaminama tik pagal Vertex.parent; remiasi prielaida, kad graph[0] yra source virðûnë
+    */
+    for(int i = 1; i < n; i++){
+        if((*graph[i].parent).identifier == graph[i-1].identifier) {
+            continue;
+        }
+        for(int j = i+1; j < n; j++){
+            if((*graph[j].parent).identifier == graph[i-1].identifier) {
+                Vertex temp = graph[i];
+                graph[i] = graph[j];
+                graph[j] = temp;
+                break;
+            } 
+        }
+        if((*graph[i].parent).identifier == graph[i-1].identifier 
+                || graph[i].parent == graph[i-1].parent) {
+            continue;
+        }
+        for(int j = i+1; j < n; j++){
+            if(graph[j].parent == graph[i-1].parent) {
+                Vertex temp = graph[i];
+                graph[i] = graph[j];
+                graph[j] = temp;
+                break;
+            } 
+        }
+    }
+    
+    ostringstream content;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < graph[i].distance_to_source; j++) {
+            content << "  ";
+        }
+        content << graph[i].identifier << "\n";
+    }
+    return content.str();
+}
+
 int main() {
     Test t;
     t.run_tests();
     
-    read_from_file("data/graph2.txt", graph, n);
+    read_from_file("data/graph1.txt", graph, n);
 
-    printf("Vertex number: %d\n", n);
     bfs(graph, &graph[0]);
-    cout << spTreeToString(graph[0], 0);
-    return 0;
-    for(int i = 0; i < n; i++) {
-        cout << "Vertice: " << graph[i].identifier << "\n  Childs: ";
-        for(int j = 0; j < graph[i].fs_size; j++) {
-            cout << (*graph[i].fs[j]).identifier << " ";
-        }
-        cout << "\n  Parent: ";
-        if(graph[i].parent != 0) {
-            cout << (*graph[i].parent).identifier;
-        }
-        else {
-            cout << "No parent";
-        }
-        cout << "\n  Distance: " << graph[i].distance_to_source << "\n";
-        cout << "  Child number: " << graph[i].childNumber << "\n";
-    }
+    cout << spTreeToString2(graph, n); 
+    
+    Edge e;
+    e.from = &graph[0];
+    e.to = &graph[3];
+    franciosa_insert(e);
+    
+    cout << "\nPo briaunos 1 -> 4 pridejimo:\n";
+    cout << spTreeToString2(graph, n); 
+    
     return 0;
 }

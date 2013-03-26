@@ -10,6 +10,7 @@ class Test {
         void graphReadingFromFile();
         void dequeOfEdgesToString();
         void franciosaRemoveEdgesPointingTo();
+        void franciosaRemoveEdgesPointingTo2();
         void franciosaEdgeWithMinimumDistance();
 };
  

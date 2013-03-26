@@ -15,6 +15,8 @@ void Test::run_tests(){
     Test::dequeOfEdgesToString();
     cout << "OK\n - Franciosa: Remove edges pointing to\t\t";
     Test::franciosaRemoveEdgesPointingTo();
+    cout << "OK\n - Franciosa: Remove edges pointing to (2)\t";
+    Test::franciosaRemoveEdgesPointingTo2();
     cout << "OK\n - Franciosa: Edge with minimum distance\t";
     Test::franciosaEdgeWithMinimumDistance();
     cout << "OK\n";
@@ -66,6 +68,22 @@ void Test::franciosaRemoveEdgesPointingTo(){
     franciosa_remove_all_pointing_to(d, &graph[3]);
     string str = "From 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
+}
+void Test::franciosaRemoveEdgesPointingTo2(){
+    struct Vertex graph[max_vertices];
+    int n;
+    
+    read_from_file("data/graph1.txt", graph, n);
+    deque<Edge> d;
+    Edge e1, e2, e3;
+    e2.from = &graph[1];
+    e2.to = &graph[3];
+    e3.from = &graph[2];
+    e3.to = &graph[3];
+    d.push_front(e2);
+    d.push_front(e3);
+    franciosa_remove_all_pointing_to(d, &graph[3]);
+    assert(d.empty());
 }
 void Test::franciosaEdgeWithMinimumDistance(){
     struct Vertex graph[max_vertices];

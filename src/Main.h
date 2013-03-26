@@ -34,5 +34,6 @@ void read_from_file(char*, struct Vertex[] , int&);
 std::string deque_of_edges_to_string(std::deque<Edge>);
 void franciosa_remove_all_pointing_to(std::deque<Edge>&, Vertex*);
 Edge franciosa_edge_with_minimum_distance (std::deque<Edge>);
+void franciosa_insert(Edge);
  
 #endif
