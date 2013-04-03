@@ -13,12 +13,18 @@ void Test::run_tests(){
     Test::graphReadingFromFile();
     cout << "OK\n - Deque of edges ToString\t\t\t";
     Test::dequeOfEdgesToString();
-    cout << "OK\n - Franciosa: Remove edges pointing to\t\t";
-    Test::franciosaRemoveEdgesPointingTo();
+    cout << "OK\n - Breath first search (1)\t\t\t";
+    Test::bfs_1();
+    cout << "OK\n - Breath first search (2)\t\t\t";
+    Test::bfs_2();
+    cout << "OK\n - Franciosa: Remove edges pointing to (1)\t";
+    Test::franciosaRemoveEdgesPointingTo_1();
     cout << "OK\n - Franciosa: Remove edges pointing to (2)\t";
-    Test::franciosaRemoveEdgesPointingTo2();
+    Test::franciosaRemoveEdgesPointingTo_2();
     cout << "OK\n - Franciosa: Edge with minimum distance\t";
     Test::franciosaEdgeWithMinimumDistance();
+    cout << "OK\n - Franciosa: Edge insert (1)\t\t\t";
+    Test::franciosaEdgeInsert_1();
     cout << "OK\n";
     cout << "Testing ended successfully\n\n\n";
 }
@@ -49,7 +55,25 @@ void Test::dequeOfEdgesToString(){
     string str = "From 2 to 4\nFrom 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
 }
-void Test::franciosaRemoveEdgesPointingTo(){
+void Test::bfs_1(){
+    struct Vertex graph[max_vertices];
+    int n;
+
+    read_from_file("data/graph1.txt", graph, n);
+    bfs(graph, &graph[0]);
+    string s = "1\n  2\n    3\n    4\n";
+    assert(s == spTreeToString_2(graph, n)); 
+}
+void Test::bfs_2(){
+    struct Vertex graph[max_vertices];
+    int n;
+
+    read_from_file("data/graph2.txt", graph, n);
+    bfs(graph, &graph[0]);
+    string s = "1\n  2\n    5\n      6\n        9\n  4\n    7\n    8\n      3\n";
+    assert(s == spTreeToString_2(graph, n)); 
+}
+void Test::franciosaRemoveEdgesPointingTo_1(){
     struct Vertex graph[max_vertices];
     int n;
     
@@ -69,7 +93,7 @@ void Test::franciosaRemoveEdgesPointingTo(){
     string str = "From 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
 }
-void Test::franciosaRemoveEdgesPointingTo2(){
+void Test::franciosaRemoveEdgesPointingTo_2(){
     struct Vertex graph[max_vertices];
     int n;
     
@@ -109,5 +133,20 @@ void Test::franciosaEdgeWithMinimumDistance(){
     assert(e1.from == returnedEdge.from);
     assert(e1.to == returnedEdge.to);
 }
+void Test::franciosaEdgeInsert_1(){
+    struct Vertex graph[max_vertices];
+    int n;
 
+    read_from_file("data/graph1.txt", graph, n);
+
+    bfs(graph, &graph[0]);
+    
+    Edge e;
+    e.from = &graph[0];
+    e.to = &graph[3];
+    franciosa_insert(e);
+    
+    string s = "1\n  2\n    3\n  4\n";
+    assert(s == spTreeToString_2(graph, n)); 
+}
 

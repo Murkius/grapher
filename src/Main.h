@@ -32,6 +32,11 @@ struct Edge {
 
 void read_from_file(char*, struct Vertex[] , int&);
 std::string deque_of_edges_to_string(std::deque<Edge>);
+std::string spTreeToString_1(struct Vertex, int);
+std::string spTreeToString_2(struct Vertex[], int);
+
+void bfs(struct Vertex[], struct Vertex*);
+
 void franciosa_remove_all_pointing_to(std::deque<Edge>&, Vertex*);
 Edge franciosa_edge_with_minimum_distance (std::deque<Edge>);
 void franciosa_insert(Edge);

@@ -9,9 +9,14 @@ class Test {
     private:
         void graphReadingFromFile();
         void dequeOfEdgesToString();
-        void franciosaRemoveEdgesPointingTo();
-        void franciosaRemoveEdgesPointingTo2();
+
+        void bfs_1();
+        void bfs_2();
+
+        void franciosaRemoveEdgesPointingTo_1();
+        void franciosaRemoveEdgesPointingTo_2();
         void franciosaEdgeWithMinimumDistance();
+        void franciosaEdgeInsert_1();
 };
  
 #endif

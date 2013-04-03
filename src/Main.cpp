@@ -21,6 +21,7 @@ void read_from_file(char* filename, struct Vertex graph[], int& n) {
         graph[c].marked = false;
         graph[c].parent = 0;
         graph[c].childNumber = 0;
+        graph[c].distance_to_source = 0;
         fscanf(fp, "%d %d", &(graph[c].identifier), &(graph[c].fs_size));
         for(int i = 0; i < graph[c].fs_size; i++) {
             fscanf(fp, "%d", &t);
@@ -126,7 +127,7 @@ string deque_of_edges_to_string(deque<Edge> d) {
     }
     return content.str();
 }
-string spTreeToString(struct Vertex source, int identLevel = 0) {
+string spTreeToString_1(struct Vertex source, int identLevel = 0) {
     /*
         Eilutė gaminama remiantis Vertex.children masyvu;
     */
@@ -136,46 +137,56 @@ string spTreeToString(struct Vertex source, int identLevel = 0) {
     }
     content << source.identifier << "\n";
     for(int c = 0; c < source.childNumber; c++) {
-        content << spTreeToString((*source.children[c]), identLevel+2);
+        content << spTreeToString_1((*source.children[c]), identLevel+2);
     }
     return content.str();
 }
-string spTreeToString2(struct Vertex graph[], int n) { 
+string spTreeToString_2(struct Vertex graph[], int n) { 
     /*
         Eilutė gaminama tik pagal Vertex.parent; remiasi prielaida, kad graph[0] yra source viršūnė
     */
+    struct Vertex* pgraph[n];
+    for(int i = 0; i < n; i++) {
+        pgraph[i] = &graph[i];
+    }
+    
     for(int i = 1; i < n; i++){
-        if((*graph[i].parent).identifier == graph[i-1].identifier) {
+        if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
             continue;
         }
         for(int j = i+1; j < n; j++){
-            if((*graph[j].parent).identifier == graph[i-1].identifier) {
-                Vertex temp = graph[i];
-                graph[i] = graph[j];
-                graph[j] = temp;
+            if((*(*pgraph[j]).parent).identifier == (*pgraph[i-1]).identifier) {
+                Vertex *temp = pgraph[i];
+                pgraph[i] = pgraph[j];
+                pgraph[j] = temp;
                 break;
             } 
         }
-        if((*graph[i].parent).identifier == graph[i-1].identifier 
-                || graph[i].parent == graph[i-1].parent) {
+        if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
+            continue;
+        }
+        if((*pgraph[i]).parent == (*pgraph[i-1]).parent) {
             continue;
         }
         for(int j = i+1; j < n; j++){
-            if(graph[j].parent == graph[i-1].parent) {
-                Vertex temp = graph[i];
-                graph[i] = graph[j];
-                graph[j] = temp;
+            if((*pgraph[j]).parent == (*pgraph[i-1]).parent) {
+                Vertex *temp = pgraph[i];
+                pgraph[i] = pgraph[j];
+                pgraph[j] = temp;
                 break;
             } 
+        }
+        if((*pgraph[i]).parent == (*pgraph[i-1]).parent) {
+            continue;
         }
     }
     
     ostringstream content;
     for(int i = 0; i < n; i++) {
-        for(int j = 0; j < graph[i].distance_to_source; j++) {
+        for(int j = 0; j < (*pgraph[i]).distance_to_source; j++) {
             content << "  ";
         }
-        content << graph[i].identifier << "\n";
+        content << (*pgraph[i]).identifier << "\n";
     }
     return content.str();
 }
@@ -187,7 +198,7 @@ int main() {
     read_from_file("data/graph1.txt", graph, n);
 
     bfs(graph, &graph[0]);
-    cout << spTreeToString2(graph, n); 
+    cout << spTreeToString_2(graph, n); 
     
     Edge e;
     e.from = &graph[0];
@@ -195,7 +206,7 @@ int main() {
     franciosa_insert(e);
     
     cout << "\nPo briaunos 1 -> 4 pridejimo:\n";
-    cout << spTreeToString2(graph, n); 
+    cout << spTreeToString_2(graph, n); 
     
     return 0;
 }
