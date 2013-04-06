@@ -17,6 +17,8 @@ class Test {
         void franciosaRemoveEdgesPointingTo_2();
         void franciosaEdgeWithMinimumDistance();
         void franciosaEdgeInsert_1();
+        void franciosaEdgeInsert_2();
+        void franciosaEdgeInsert_3();
 };
  
 #endif

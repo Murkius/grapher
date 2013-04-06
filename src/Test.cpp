@@ -25,6 +25,10 @@ void Test::run_tests(){
     Test::franciosaEdgeWithMinimumDistance();
     cout << "OK\n - Franciosa: Edge insert (1)\t\t\t";
     Test::franciosaEdgeInsert_1();
+    cout << "OK\n - Franciosa: Edge insert (2)\t\t\t";
+    Test::franciosaEdgeInsert_2();
+    cout << "OK\n - Franciosa: Edge insert (3)\t\t\t";
+    Test::franciosaEdgeInsert_3();
     cout << "OK\n";
     cout << "Testing ended successfully\n\n\n";
 }
@@ -147,6 +151,38 @@ void Test::franciosaEdgeInsert_1(){
     franciosa_insert(e);
     
     string s = "1\n  2\n    3\n  4\n";
+    assert(s == spTreeToString_2(graph, n)); 
+}
+void Test::franciosaEdgeInsert_2(){
+    struct Vertex graph[max_vertices];
+    int n;
+
+    read_from_file("data/graph2.txt", graph, n);
+
+    bfs(graph, &graph[0]);
+    
+    Edge e;
+    e.from = &graph[0];
+    e.to = &graph[5];
+    franciosa_insert(e);
+    
+    string s = "1\n  2\n    5\n  4\n    7\n    8\n      3\n  6\n    9\n";
+    assert(s == spTreeToString_2(graph, n)); 
+}
+void Test::franciosaEdgeInsert_3(){
+    struct Vertex graph[max_vertices];
+    int n;
+
+    read_from_file("data/graph2.txt", graph, n);
+
+    bfs(graph, &graph[0]);
+    
+    Edge e;
+    e.from = &graph[1];
+    e.to = &graph[8];
+    franciosa_insert(e);
+
+    string s = "1\n  2\n    5\n      6\n    9\n  4\n    7\n    8\n      3\n";
     assert(s == spTreeToString_2(graph, n)); 
 }
 

@@ -8,6 +8,7 @@
 #include <deque>
 #include <iostream>
 #include <sstream>
+#include <limits>
 
 #include "Constants.h"
 #include "Test.h"
@@ -30,7 +31,7 @@ struct Edge {
 };
 
 
-void read_from_file(char*, struct Vertex[] , int&);
+void read_from_file(const char[], struct Vertex[] , int&);
 std::string deque_of_edges_to_string(std::deque<Edge>);
 std::string spTreeToString_1(struct Vertex, int);
 std::string spTreeToString_2(struct Vertex[], int);

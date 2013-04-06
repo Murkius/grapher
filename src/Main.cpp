@@ -5,7 +5,7 @@ using namespace std;
 int n; //Number of vertices in a graph
 struct Vertex graph[max_vertices];
 
-void read_from_file(char* filename, struct Vertex graph[], int& n) {
+void read_from_file(const char filename[], struct Vertex graph[], int& n) {
     FILE *fp;
     int t;
 
@@ -103,8 +103,7 @@ void franciosa_propagate(deque<Edge> d) {
     }
 }
 void franciosa_insert(Edge e) {
-    (*e.from).fs_size++;
-    (*e.from).fs[(*e.from).fs_size] = e.to;
+    (*e.from).fs[(*e.from).fs_size++] = e.to;
     //TODO: Čia x turėtų būti įdedamas į e.to.bs
     if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: čia turėtų būti lyginama pagal rank
         deque<Edge> d;
@@ -116,6 +115,7 @@ void franciosa_delete() {
 
 }
 /* ------------------------------------- Franciosa end ---------------------------------------- */
+
 string deque_of_edges_to_string(deque<Edge> d) {
     deque<Edge>::iterator i = d.begin();
     ostringstream content;
@@ -150,6 +150,8 @@ string spTreeToString_2(struct Vertex graph[], int n) {
         pgraph[i] = &graph[i];
     }
     
+    bool brotherFound;
+    int baseId;
     for(int i = 1; i < n; i++){
         if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
             continue;
@@ -165,19 +167,24 @@ string spTreeToString_2(struct Vertex graph[], int n) {
         if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
             continue;
         }
-        if((*pgraph[i]).parent == (*pgraph[i-1]).parent) {
-            continue;
+        
+        baseId = i-1;
+        brotherFound = false;
+        while(baseId > 0 && !brotherFound){
+            for(int j = i; j < n; j++){
+                if((*pgraph[j]).parent == (*pgraph[baseId]).parent) {
+                    brotherFound = true;
+                    Vertex *temp = pgraph[i];
+                    pgraph[i] = pgraph[j];
+                    pgraph[j] = temp;
+                    break;
+                } 
+            }
+            baseId--;
         }
-        for(int j = i+1; j < n; j++){
-            if((*pgraph[j]).parent == (*pgraph[i-1]).parent) {
-                Vertex *temp = pgraph[i];
-                pgraph[i] = pgraph[j];
-                pgraph[j] = temp;
-                break;
-            } 
-        }
-        if((*pgraph[i]).parent == (*pgraph[i-1]).parent) {
-            continue;
+        if(!brotherFound) {
+            cout << "\nNetinkama trumpiausio kelio medzio struktura!\n";
+            return "";
         }
     }
     
