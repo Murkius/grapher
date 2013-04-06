@@ -2,6 +2,12 @@
 #define TEST_H
 
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include "Main.h"
+
+
  
 class Test {
     public:

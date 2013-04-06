@@ -2,43 +2,13 @@
 
 using namespace std;
 
-int n; //Number of vertices in a graph
-struct Vertex graph[max_vertices];
-
-void read_from_file(const char filename[], struct Vertex graph[], int& n) {
-    FILE *fp;
-    int t;
-
-    fp = fopen(filename,"r"); // read mode
-    if( fp == NULL ) {
-        perror("Error while opening the file.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fscanf(fp, "%d", &n);
-    
-    for (int c = 0; c < n; c++) {
-        graph[c].marked = false;
-        graph[c].parent = 0;
-        graph[c].childNumber = 0;
-        graph[c].distance_to_source = 0;
-        fscanf(fp, "%d %d", &(graph[c].identifier), &(graph[c].fs_size));
-        for(int i = 0; i < graph[c].fs_size; i++) {
-            fscanf(fp, "%d", &t);
-            graph[c].fs[i] = &(graph[t-1]); //TODO: pataisyti
-        }
-    }
-
-    fclose(fp);
-}
-
 /* ----------------- Breadth-first search (static, for non weighted graphs) ------------------- */
-void bfs(struct Vertex graph[], struct Vertex *source) {
+void bfs(Graph g) {
     queue<struct Vertex*> Q; 
     struct Vertex* t, u;
     
-    Q.push(source);
-    (*source).marked = true;
+    Q.push(g.getSourceVertex());
+    (*g.getSourceVertex()).marked = true;
     while (not Q.empty()) {
         t = Q.front();
         Q.pop();
@@ -127,93 +97,25 @@ string deque_of_edges_to_string(deque<Edge> d) {
     }
     return content.str();
 }
-string spTreeToString_1(struct Vertex source, int identLevel = 0) {
-    /*
-        Eilutė gaminama remiantis Vertex.children masyvu;
-    */
-    ostringstream content;
-    for(int i = 0; i < identLevel; i++) {
-        content << " ";
-    }
-    content << source.identifier << "\n";
-    for(int c = 0; c < source.childNumber; c++) {
-        content << spTreeToString_1((*source.children[c]), identLevel+2);
-    }
-    return content.str();
-}
-string spTreeToString_2(struct Vertex graph[], int n) { 
-    /*
-        Eilutė gaminama tik pagal Vertex.parent; remiasi prielaida, kad graph[0] yra source viršūnė
-    */
-    struct Vertex* pgraph[n];
-    for(int i = 0; i < n; i++) {
-        pgraph[i] = &graph[i];
-    }
-    
-    bool brotherFound;
-    int baseId;
-    for(int i = 1; i < n; i++){
-        if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
-            continue;
-        }
-        for(int j = i+1; j < n; j++){
-            if((*(*pgraph[j]).parent).identifier == (*pgraph[i-1]).identifier) {
-                Vertex *temp = pgraph[i];
-                pgraph[i] = pgraph[j];
-                pgraph[j] = temp;
-                break;
-            } 
-        }
-        if((*(*pgraph[i]).parent).identifier == (*pgraph[i-1]).identifier) {
-            continue;
-        }
-        
-        baseId = i-1;
-        brotherFound = false;
-        while(baseId > 0 && !brotherFound){
-            for(int j = i; j < n; j++){
-                if((*pgraph[j]).parent == (*pgraph[baseId]).parent) {
-                    brotherFound = true;
-                    Vertex *temp = pgraph[i];
-                    pgraph[i] = pgraph[j];
-                    pgraph[j] = temp;
-                    break;
-                } 
-            }
-            baseId--;
-        }
-        if(!brotherFound) {
-            cout << "\nNetinkama trumpiausio kelio medzio struktura!\n";
-            return "";
-        }
-    }
-    
-    ostringstream content;
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < (*pgraph[i]).distance_to_source; j++) {
-            content << "  ";
-        }
-        content << (*pgraph[i]).identifier << "\n";
-    }
-    return content.str();
-}
 
 int main() {
     Test t;
     t.run_tests();
-    
-    read_from_file("data/graph1.txt", graph, n);
 
-    bfs(graph, &graph[0]);
-    cout << spTreeToString_2(graph, n); 
+    Graph g;
+    g.readFromFile("data/graph1.txt");
+    g.setSourceVertexByIndex(0);
     
+    bfs(g);
+    cout << g.spTreeToString(); 
+
     Edge e;
-    e.from = &graph[0];
-    e.to = &graph[3];
+    e.from = &g.graph[0];
+    e.to = &g.graph[3];
     franciosa_insert(e);
-    
+
     cout << "\nPo briaunos 1 -> 4 pridejimo:\n";
-    cout << spTreeToString_2(graph, n); 
-    
+    cout << g.spTreeToString(); 
+
     return 0;
 }

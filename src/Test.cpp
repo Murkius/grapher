@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
 #include "Test.h"
-#include "Main.h"
-#include "Constants.h"
 
 using namespace std;
 
@@ -33,103 +28,102 @@ void Test::run_tests(){
     cout << "Testing ended successfully\n\n\n";
 }
 void Test::graphReadingFromFile(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
     
-    read_from_file("data/graph1.txt", graph, n);
-    assert(n==4);
-    assert(graph[1].identifier==2);
-    assert(graph[1].fs_size==2);
-    assert((*graph[1].fs[0]).identifier==3);
-    assert((*graph[1].fs[1]).identifier==4);
+    g.readFromFile("data/graph1.txt");
+    assert(g.n==4);
+    assert(g.graph[1].identifier==2);
+    assert(g.graph[1].fs_size==2);
+    assert((*g.graph[1].fs[0]).identifier==3);
+    assert((*g.graph[1].fs[1]).identifier==4);
 }
 void Test::dequeOfEdgesToString(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
     
-    read_from_file("data/graph1.txt", graph, n);
+    g.readFromFile("data/graph1.txt");
     deque<Edge> d;
     Edge e1, e2;
-    e1.from = &graph[0];
-    e1.to = &graph[1];
-    e2.from = &graph[1];
-    e2.to = &graph[3];
+    e1.from = &g.graph[0];
+    e1.to = &g.graph[1];
+    e2.from = &g.graph[1];
+    e2.to = &g.graph[3];
     d.push_front(e1);
     d.push_front(e2);
     string str = "From 2 to 4\nFrom 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
 }
 void Test::bfs_1(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
 
-    read_from_file("data/graph1.txt", graph, n);
-    bfs(graph, &graph[0]);
+    g.readFromFile("data/graph1.txt");
+    g.setSourceVertexByIndex(0);
+    
+    bfs(g);
+    
     string s = "1\n  2\n    3\n    4\n";
-    assert(s == spTreeToString_2(graph, n)); 
+    assert(s == g.spTreeToString()); 
 }
 void Test::bfs_2(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
 
-    read_from_file("data/graph2.txt", graph, n);
-    bfs(graph, &graph[0]);
+    g.readFromFile("data/graph2.txt");
+    g.setSourceVertexByIndex(0);
+    
+    bfs(g);
+    
     string s = "1\n  2\n    5\n      6\n        9\n  4\n    7\n    8\n      3\n";
-    assert(s == spTreeToString_2(graph, n)); 
+    assert(s == g.spTreeToString()); 
 }
 void Test::franciosaRemoveEdgesPointingTo_1(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
     
-    read_from_file("data/graph1.txt", graph, n);
+    g.readFromFile("data/graph1.txt");
     deque<Edge> d;
     Edge e1, e2, e3;
-    e1.from = &graph[0];
-    e1.to = &graph[1];
-    e2.from = &graph[1];
-    e2.to = &graph[3];
-    e3.from = &graph[2];
-    e3.to = &graph[3];
+    e1.from = &g.graph[0];
+    e1.to = &g.graph[1];
+    e2.from = &g.graph[1];
+    e2.to = &g.graph[3];
+    e3.from = &g.graph[2];
+    e3.to = &g.graph[3];
     d.push_front(e1);
     d.push_front(e2);
     d.push_front(e3);
-    franciosa_remove_all_pointing_to(d, &graph[3]);
+    franciosa_remove_all_pointing_to(d, &g.graph[3]);
     string str = "From 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
 }
 void Test::franciosaRemoveEdgesPointingTo_2(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
     
-    read_from_file("data/graph1.txt", graph, n);
+    g.readFromFile("data/graph1.txt");
     deque<Edge> d;
     Edge e1, e2, e3;
-    e2.from = &graph[1];
-    e2.to = &graph[3];
-    e3.from = &graph[2];
-    e3.to = &graph[3];
+    e2.from = &g.graph[1];
+    e2.to = &g.graph[3];
+    e3.from = &g.graph[2];
+    e3.to = &g.graph[3];
     d.push_front(e2);
     d.push_front(e3);
-    franciosa_remove_all_pointing_to(d, &graph[3]);
+    franciosa_remove_all_pointing_to(d, &g.graph[3]);
     assert(d.empty());
 }
 void Test::franciosaEdgeWithMinimumDistance(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
     
-    read_from_file("data/graph1.txt", graph, n);
-    graph[0].distance_to_source = 0;
-    graph[1].distance_to_source = 1;
-    graph[2].distance_to_source = 2;
-    graph[3].distance_to_source = 2;
+    g.readFromFile("data/graph1.txt");
+    g.graph[0].distance_to_source = 0;
+    g.graph[1].distance_to_source = 1;
+    g.graph[2].distance_to_source = 2;
+    g.graph[3].distance_to_source = 2;
     deque<Edge> d;
     Edge e1, e2, e3;
-    e1.from = &graph[1];
-    e1.to = &graph[3];
-    e2.from = &graph[2];
-    e2.to = &graph[3];
-    e3.from = &graph[2];
-    e3.to = &graph[3];
+    e1.from = &g.graph[1];
+    e1.to = &g.graph[3];
+    e2.from = &g.graph[2];
+    e2.to = &g.graph[3];
+    e3.from = &g.graph[2];
+    e3.to = &g.graph[3];
     d.push_front(e1);
     d.push_front(e2);
     d.push_front(e3);
@@ -138,51 +132,51 @@ void Test::franciosaEdgeWithMinimumDistance(){
     assert(e1.to == returnedEdge.to);
 }
 void Test::franciosaEdgeInsert_1(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
 
-    read_from_file("data/graph1.txt", graph, n);
-
-    bfs(graph, &graph[0]);
+    g.readFromFile("data/graph1.txt");
+    g.setSourceVertexByIndex(0);
+    
+    bfs(g);
     
     Edge e;
-    e.from = &graph[0];
-    e.to = &graph[3];
+    e.from = &g.graph[0];
+    e.to = &g.graph[3];
     franciosa_insert(e);
     
     string s = "1\n  2\n    3\n  4\n";
-    assert(s == spTreeToString_2(graph, n)); 
+    assert(s == g.spTreeToString()); 
 }
 void Test::franciosaEdgeInsert_2(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
 
-    read_from_file("data/graph2.txt", graph, n);
-
-    bfs(graph, &graph[0]);
+    g.readFromFile("data/graph2.txt");
+    g.setSourceVertexByIndex(0);
+    
+    bfs(g);
     
     Edge e;
-    e.from = &graph[0];
-    e.to = &graph[5];
+    e.from = &g.graph[0];
+    e.to = &g.graph[5];
     franciosa_insert(e);
     
     string s = "1\n  2\n    5\n  4\n    7\n    8\n      3\n  6\n    9\n";
-    assert(s == spTreeToString_2(graph, n)); 
+    assert(s == g.spTreeToString()); 
 }
 void Test::franciosaEdgeInsert_3(){
-    struct Vertex graph[max_vertices];
-    int n;
+    Graph g;
 
-    read_from_file("data/graph2.txt", graph, n);
-
-    bfs(graph, &graph[0]);
+    g.readFromFile("data/graph2.txt");
+    g.setSourceVertexByIndex(0);
+    
+    bfs(g);
     
     Edge e;
-    e.from = &graph[1];
-    e.to = &graph[8];
+    e.from = &g.graph[1];
+    e.to = &g.graph[8];
     franciosa_insert(e);
 
     string s = "1\n  2\n    5\n      6\n    9\n  4\n    7\n    8\n      3\n";
-    assert(s == spTreeToString_2(graph, n)); 
+    assert(s == g.spTreeToString()); 
 }
 
