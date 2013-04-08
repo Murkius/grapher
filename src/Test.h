@@ -14,6 +14,10 @@ class Test {
         void run_tests();
     private:
         void graphReadingFromFile();
+        void graphReadWriteConsistency();
+        
+        void insertionsReadWriteConsistency();
+        
         void dequeOfEdgesToString();
 
         void bfs_1();

@@ -24,6 +24,10 @@ void Test::run_tests(){
     Test::franciosaEdgeInsert_2();
     cout << "OK\n - Franciosa: Edge insert (3)\t\t\t";
     Test::franciosaEdgeInsert_3();
+    cout << "OK\n - Graph read & write consistency\t\t";
+    Test::graphReadWriteConsistency();
+    cout << "OK\n - Insertions read & write consistency\t\t";
+    Test::insertionsReadWriteConsistency();
     cout << "OK\n";
     cout << "Testing ended successfully\n\n\n";
 }
@@ -179,4 +183,32 @@ void Test::franciosaEdgeInsert_3(){
     string s = "1\n  2\n    5\n      6\n    9\n  4\n    7\n    8\n      3\n";
     assert(s == g.spTreeToString()); 
 }
+void Test::graphReadWriteConsistency(){
+    const char *filename = "test.txt";
+    Graph g, h;
+    g.generate("Gnp", 10, 0.6);
+    g.saveToFile(filename);
+    h.readFromFile(filename);
+    for(int i = 0; i < g.n; i++) {
+        assert(g.graph[i].identifier == h.graph[i].identifier);
+        assert(g.graph[i].fs_size == h.graph[i].fs_size);
+    }
+    remove(filename);
+}
+void Test::insertionsReadWriteConsistency(){
+    const char *filename = "test.txt";
+    Graph g;
+    std::vector<Edge> insertions, updates;
+    g.generate("Gnp", 10, 0.5);
+    g.generateInsertions(10, &insertions);
+    g.saveUpdatesToFile(filename, insertions);
+    g.readUpdatesFromFile(filename, &updates);
+    for(int i = 0; i < insertions.size(); i++) {
+        assert(insertions[i].from == updates[i].from);
+        assert(insertions[i].to == updates[i].to);
+        assert(insertions[i].operation == updates[i].operation);
+    }
+    remove(filename);
+}
+
 

@@ -3,29 +3,110 @@
 using namespace std;
 
 Graph::Graph() {
+    n = 0;
     srand((unsigned)time(0));
 }
 
 void Graph::generateByGnp(int n, float p) {
+    Graph::n = n;
     for(int i = 0; i < n; i++){
         graph[i].identifier = i;
         graph[i].fs_size = 0;
         //TODO: graph[i].bs_size = 0;
     }
     
+    int m = 0;
     for(int i = 0; i < n; i++) { //from
         for(int j = 0; j < n; j++) { //to
-            if((float)rand()/(float)RAND_MAX < p) {
+            if(i != j && (float)rand()/(float)RAND_MAX < p) {
                 graph[i].fs[graph[i].fs_size++] = &graph[j];
+                m++;
             }            
         }
     }
 }
+bool Graph::reachableFromSource() {
+    queue<struct Vertex*> Q; 
+    struct Vertex* t, u;
+    
+    Q.push(getSourceVertex());
+    (*getSourceVertex()).marked = true;
+    while (not Q.empty()) {
+        t = Q.front();
+        Q.pop();
+        for (int c = 0; c < (*t).fs_size; c++) {
+            if (not (*(*t).fs[c]).marked) {
+                (*(*t).fs[c]).marked = true;
+                Q.push((*t).fs[c]);
+            }
+        }
+    }
+    
+    bool connective = true;
+    for(int i = 0; i < n; i++) {
+        if(graph[i].marked) {
+            graph[i].marked = false;
+        }
+        else {
+            connective = false;
+        }
+    }
+    return connective;
+}
+void Graph::generate(string method, float param1, float param2) {
+    //long c = 0;
+    do {
+        //c++;
+        if(method == "Gnp") {
+            generateByGnp((int)param1, param2);
+        }
+        setSourceVertexByIndex(0);
+    } while(!reachableFromSource());
+    //cout << "Sugeneruota is " << c << " karto\n";
+}
+
+void Graph::generateInsertions(int numberOfInsertions, std::vector<Edge> *insertions) {
+    int from, to;
+    bool suitableEdge;
+    
+    for(int i = 0; i < numberOfInsertions; i++) {
+        do {
+            suitableEdge = true;
+            from = (int)round(((float)rand()/RAND_MAX)*(n-1));
+            to = (int)round(((float)rand()/RAND_MAX)*(n-1));
+            if(from == to) {    //Atmetame briaunas rodančias į tą pačią viršūnę iš kurios išėjo
+                suitableEdge = false;
+                continue;
+            }
+            for(int j = 0; j < graph[from].fs_size; j++) { //Atmetame briaunas kurios jau egzistuoja grafe
+                if(graph[from].fs[j] == &graph[to]) {
+                    suitableEdge = false;
+                    break;
+                }
+            }
+            if(not suitableEdge) {
+                continue;
+            }
+            for(int j = 0; j < (*insertions).size(); j++) { //Atmetame briaunas kurios jau egzistuoja pridedamų briaunų sąraše
+                if((*insertions)[j].from == &graph[from] && (*insertions)[j].to == &graph[to]) {
+                    suitableEdge = false;
+                    break;
+                }
+            }
+        } while(not suitableEdge);
+        Edge e;
+        e.from = &graph[from];
+        e.to = &graph[to];
+        e.operation = '+';
+        (*insertions).push_back(e);
+    }
+}
+
 void Graph::readFromFile(const char filename[]) {
     FILE *fp;
     int t;
 
-    fp = fopen(filename,"r"); // read mode
+    fp = fopen(filename, "r");
     if( fp == NULL ) {
         perror("Error while opening the file.\n");
         exit(EXIT_FAILURE);
@@ -45,6 +126,72 @@ void Graph::readFromFile(const char filename[]) {
         }
     }
 
+    fclose(fp);
+}
+void Graph::saveToFile(const char filename[]) {
+    FILE *fp;
+
+    fp = fopen(filename, "w");
+    if( fp == NULL ) {
+        perror("Error while opening the file.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    fprintf(fp, "%d\n", n);
+    
+    for (int c = 0; c < n; c++) {
+        fprintf(fp, "%d %d", graph[c].identifier, graph[c].fs_size);
+        for(int i = 0; i < graph[c].fs_size; i++) {
+            fprintf(fp, " %d", (*graph[c].fs[i]).identifier);
+        }
+        fprintf(fp, " \n");
+    }
+    
+    fclose(fp);
+}
+void Graph::readUpdatesFromFile(const char filename[], std::vector<Edge> *updates) {
+    FILE *fp;
+    int updatesNumber, fromId, toId;
+    
+    fp = fopen(filename, "r");
+    if( fp == NULL ) {
+        perror("Error while opening the file.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    fscanf(fp, "%d\n", &updatesNumber);
+    
+    for (int c = 0; c < updatesNumber; c++) {
+        Edge e;
+        fscanf(fp, "%c %d %d\n", &e.operation, &fromId, &toId);
+        for(int i = 0; i < n; i++) {
+            if(graph[i].identifier == fromId) {
+                e.from = &graph[i];
+            }
+            if(graph[i].identifier == toId) {
+                e.to = &graph[i];
+            }
+        }
+        (*updates).push_back(e);
+    }
+    
+    fclose(fp);
+}
+void Graph::saveUpdatesToFile(const char filename[], std::vector<Edge> updates) {
+    FILE *fp;
+
+    fp = fopen(filename, "w");
+    if( fp == NULL ) {
+        perror("Error while opening the file.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    fprintf(fp, "%d\n", updates.size());
+    
+    for (int c = 0; c < updates.size(); c++) {
+        fprintf(fp, "%c %d %d\n", updates[c].operation, (*updates[c].from).identifier, (*updates[c].to).identifier);
+    }
+    
     fclose(fp);
 }
 
