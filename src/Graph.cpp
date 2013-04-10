@@ -114,6 +114,8 @@ void Graph::readFromFile(const char filename[]) {
 
     fscanf(fp, "%d", &n);
     
+    std::vector<int> fs[n];
+    
     for (int c = 0; c < n; c++) {
         graph[c].marked = false;
         graph[c].parent = 0;
@@ -122,7 +124,17 @@ void Graph::readFromFile(const char filename[]) {
         fscanf(fp, "%d %d", &(graph[c].identifier), &(graph[c].fs_size));
         for(int i = 0; i < graph[c].fs_size; i++) {
             fscanf(fp, "%d", &t);
-            graph[c].fs[i] = &(graph[t-1]); //TODO: pataisyti
+            fs[c].push_back(t);
+        }
+    }
+    
+    for (int c = 0; c < n; c++) {
+        for(int fsi = 0; fsi < graph[c].fs_size; fsi++) {
+            for (int c2 = 0; c2 < n; c2++) {
+                if(fs[c][fsi] == graph[c2].identifier) {
+                    graph[c].fs[fsi] = &graph[c2];
+                }
+            }
         }
     }
 
