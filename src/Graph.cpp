@@ -165,6 +165,8 @@ void Graph::readUpdatesFromFile(const char filename[], std::vector<Edge> *update
     FILE *fp;
     int updatesNumber, fromId, toId;
     
+    (*updates).clear();
+    
     fp = fopen(filename, "r");
     if( fp == NULL ) {
         perror("Error while opening the file.\n");
