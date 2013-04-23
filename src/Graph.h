@@ -19,9 +19,6 @@ struct Vertex {
     int distance_to_source;
     int fs_size;
     Vertex* fs[max_vertices];
-    
-    int childNumber;
-    Vertex* children[max_vertices];
 };
 struct Edge {
     Vertex* from;
@@ -35,6 +32,7 @@ class Graph {
         struct Vertex graph[max_vertices];
         
         Graph();
+        Graph(const Graph&);
         
         void generate(std::string, float, float);
         void generateInsertions(int, std::vector<Edge>*);

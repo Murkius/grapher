@@ -7,6 +7,11 @@ Graph::Graph() {
     srand((unsigned)time(0));
 }
 
+Graph::Graph(const Graph &g) {
+    n = g.n;
+    
+}
+
 void Graph::generateByGnp(int n, float p) {
     Graph::n = n;
     for(int i = 0; i < n; i++){
@@ -119,7 +124,6 @@ void Graph::readFromFile(const char filename[]) {
     for (int c = 0; c < n; c++) {
         graph[c].marked = false;
         graph[c].parent = 0;
-        graph[c].childNumber = 0;
         graph[c].distance_to_source = 0;
         fscanf(fp, "%d %d", &(graph[c].identifier), &(graph[c].fs_size));
         for(int i = 0; i < graph[c].fs_size; i++) {

@@ -4,15 +4,25 @@ using namespace std;
 
 Timer::Timer() {
     QueryPerformanceFrequency(&qpFrequency);
+    previous.QuadPart = 0;
+    previousClock = 0;
 }
 void Timer::start() {
     QueryPerformanceCounter(&startQp);
+    startClock = clock();
 }
 void Timer::stop() {
+ stopClock = clock();
     QueryPerformanceCounter(&stopQp);
+   
+    previous.QuadPart += (stopQp.QuadPart - startQp.QuadPart);
+    previousClock += stopClock - startClock;
 }
 double Timer::getTime() {
-    return (stopQp.QuadPart - startQp.QuadPart)/(double(qpFrequency.QuadPart));
+    return previous.QuadPart/(double(qpFrequency.QuadPart)/1000);
+}
+long Timer::getClockTime() {
+    return previousClock;
 }
 
 

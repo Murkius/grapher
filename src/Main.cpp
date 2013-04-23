@@ -2,22 +2,68 @@
 
 using namespace std;
 
+    const int numberOfGraphs = 30;
+    const int n = 3000; //30 graphs * 100 times
+    Graph graphArray[n];
+    std::vector<Edge> updates[n];
+
 /* ----------------- Breadth-first search (static, for non weighted graphs) ------------------- */
-void bfs(Graph g) {
-    queue<struct Vertex*> Q; 
+void bfs(Graph &g) {
+    deque<struct Vertex*> Q; 
     struct Vertex* t, u;
-    
-    Q.push(g.getSourceVertex());
+    Q.push_back(g.getSourceVertex());
     (*g.getSourceVertex()).marked = true;
     while (not Q.empty()) {
         t = Q.front();
-        Q.pop();
+        Q.pop_front();
         for (int c = 0; c < (*t).fs_size; c++) {
             if (not (*(*t).fs[c]).marked) {
                 (*(*t).fs[c]).marked = true;
                 (*(*t).fs[c]).parent = t;
                 (*(*t).fs[c]).distance_to_source = (*t).distance_to_source+1;
-                (*t).children[(*t).childNumber++] = (*t).fs[c];
+                Q.push_back((*t).fs[c]);
+            }
+        }
+    }
+}
+
+void bfs2(Graph &g) {
+    bool marks[max_vertices] = {};
+    queue<struct Vertex*> Q; 
+    struct Vertex* t, u;
+    
+    Q.push(g.getSourceVertex());
+    //(*g.getSourceVertex()).marked = true;
+    marks[(*g.getSourceVertex()).identifier] = true;
+    while (not Q.empty()) {
+        t = Q.front();
+        Q.pop();
+        for (int c = 0; c < (*t).fs_size; c++) {
+            if (not marks[(*(*t).fs[c]).identifier]) {
+                marks[(*(*t).fs[c]).identifier] = true;
+                (*(*t).fs[c]).parent = t;
+                (*(*t).fs[c]).distance_to_source = (*t).distance_to_source+1;
+                Q.push((*t).fs[c]);
+            }
+        }
+    }
+}
+
+void bfs3(Graph &g) {
+    bool markSign = not (*g.getSourceVertex()).marked;
+    queue<struct Vertex*> Q; 
+    struct Vertex* t, u;
+    
+    Q.push(g.getSourceVertex());
+    (*g.getSourceVertex()).marked = markSign;
+    while (not Q.empty()) {
+        t = Q.front();
+        Q.pop();
+        for (int c = 0; c < (*t).fs_size; c++) {
+            if ((*(*t).fs[c]).marked != markSign) {
+                (*(*t).fs[c]).marked = markSign;
+                (*(*t).fs[c]).parent = t;
+                (*(*t).fs[c]).distance_to_source = (*t).distance_to_source+1;
                 Q.push((*t).fs[c]);
             }
         }
@@ -54,10 +100,6 @@ void franciosa_propagate(deque<Edge> d) {
         Edge min_edge = franciosa_edge_with_minimum_distance(d);
         franciosa_remove_all_pointing_to(d, min_edge.to);
         (*min_edge.to).parent = min_edge.from;
-        
-        //TODO: pašalinti iš ankstesnio tėvo vaikų sąrašo (tiksli pozicija nežinoma) 
-        // ir visus paskiau einančius vaikus perkelti 1 vieta atgal - ėda per daug laiko
-        (*min_edge.from).children[(*min_edge.from).childNumber++] = min_edge.to;
         
         if((*min_edge.to).distance_to_source > (*min_edge.from).distance_to_source + 1){
             (*min_edge.to).distance_to_source = (*min_edge.from).distance_to_source + 1;
@@ -97,25 +139,76 @@ string deque_of_edges_to_string(deque<Edge> d) {
     }
     return content.str();
 }
+std::string numberedFilename(std::string prefix, int number){
+    std::ostringstream strStream;
+    strStream << prefix << number;
+    return strStream.str();
+}
+
+void prepareGraphsForBFSTesting(){
+    cout << "Preloading graphs & updates start\n";
+    for(int i = 0; i < n; i++){
+        graphArray[i].readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", i % numberOfGraphs+1).c_str());
+        graphArray[i].setSourceVertexByIndex(0);
+        graphArray[i].readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", i % numberOfGraphs+1).c_str(), &updates[i]);
+    }
+    cout << "Preloading graphs & updates end\n";
+}
+void testBfsVariants(){
+    prepareGraphsForBFSTesting();
+
+    Timer t1;
+    t1.start();  
+    for(int k = 0; k < n; k++){
+        
+        bfs(graphArray[k]);
+        for(int updateId = 0; updateId < updates[k].size(); updateId++){
+            for(int vertexId = 0; vertexId < graphArray[k].n; vertexId++){
+                graphArray[k].graph[vertexId].marked = false;
+            }
+            (*updates[k][updateId].from).fs[(*updates[k][updateId].from).fs_size++] = updates[k][updateId].to;
+            bfs(graphArray[k]);
+        }
+    }
+    t1.stop();
+    cout << "Bfs1: " << t1.getTime() << " " << t1.getClockTime() << "\n";
+    
+    prepareGraphsForBFSTesting();
+    
+    Timer t2;
+    t2.start();  
+    for(int k = 0; k < n; k++){
+        
+        bfs2(graphArray[k]);
+        for(int updateId = 0; updateId < updates[k].size(); updateId++){
+            (*updates[k][updateId].from).fs[(*updates[k][updateId].from).fs_size++] = updates[k][updateId].to;
+            bfs2(graphArray[k]);
+        }
+    }
+    t2.stop();
+    cout << "Bfs2: " << t2.getTime() << " " << t2.getClockTime() << "\n";
+    
+    prepareGraphsForBFSTesting();
+    
+    Timer t3;
+    t3.start();  
+    for(int k = 0; k < n; k++){
+        
+        bfs3(graphArray[k]);
+        for(int updateId = 0; updateId < updates[k].size(); updateId++){
+            (*updates[k][updateId].from).fs[(*updates[k][updateId].from).fs_size++] = updates[k][updateId].to;
+            bfs3(graphArray[k]);
+        }
+    }
+    t3.stop();
+    cout << "Bfs3: " << t3.getTime() << " " << t3.getClockTime() << "\n";
+}
 
 int main() {
-    Test t;
-    t.run_tests();
+    //Test tester;
+    //tester.run_tests();
 
-    Graph g;
-    g.readFromFile("data/graph1.txt");
-    g.setSourceVertexByIndex(0);
+    testBfsVariants();
     
-    bfs(g);
-    cout << g.spTreeToString(); 
-
-    Edge e;
-    e.from = &g.graph[0];
-    e.to = &g.graph[3];
-    franciosa_insert(e);
-
-    cout << "\nPo briaunos 1 -> 4 pridejimo:\n";
-    cout << g.spTreeToString(); 
-
     return 0;
 }
