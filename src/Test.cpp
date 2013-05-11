@@ -32,51 +32,57 @@ void Test::run_tests(){
     cout << "Testing ended successfully\n\n\n";
 }
 void Test::graphReadingFromFile(){
-    Graph g;
+    Graph *g = new Graph;
     
-    g.readFromFile("data/graph1.txt");
-    assert(g.n==4);
-    assert(g.graph[1].identifier==2);
-    assert(g.graph[1].fs_size==2);
-    assert((*g.graph[1].fs[0]).identifier==3);
-    assert((*g.graph[1].fs[1]).identifier==4);
+    (*g).readFromFile("data/graph1.txt");
+    assert((*g).n==4);
+    assert((*g).graph[1].identifier==2);
+    assert((*g).graph[1].fs.size()==2);
+    assert((*(*g).graph[1].fs[0]).identifier==3);
+    assert((*(*g).graph[1].fs[1]).identifier==4);
+    delete g;
 }
 void Test::dequeOfEdgesToString(){
-    Graph g;
+    Graph *g = new Graph;
     
-    g.readFromFile("data/graph1.txt");
+    (*g).readFromFile("data/graph1.txt");
     deque<Edge> d;
     Edge e1, e2;
-    e1.from = &g.graph[0];
-    e1.to = &g.graph[1];
-    e2.from = &g.graph[1];
-    e2.to = &g.graph[3];
+    e1.from = &(*g).graph[0];
+    e1.to = &(*g).graph[1];
+    e2.from = &(*g).graph[1];
+    e2.to = &(*g).graph[3];
     d.push_front(e1);
     d.push_front(e2);
     string str = "From 2 to 4\nFrom 1 to 2\n";
     assert(str == deque_of_edges_to_string(d));
+    delete g;
 }
 void Test::bfs_1(){
-    Graph g;
+    Graph *g =new Graph;
 
-    g.readFromFile("data/graph1.txt");
-    g.setSourceVertexByIndex(0);
+    (*g).readFromFile("data/graph1.txt");
+    (*g).setSourceVertexByIndex(0);
     
-    bfs(g);
+    bfs(*g);
     
     string s = "1\n  2\n    3\n    4\n";
-    assert(s == g.spTreeToString()); 
+    assert(s == (*g).spTreeToString()); 
+    
+    delete g;
 }
 void Test::bfs_2(){
-    Graph g;
+    Graph *g = new Graph;
 
-    g.readFromFile("data/graph2.txt");
-    g.setSourceVertexByIndex(0);
+    (*g).readFromFile("data/graph2.txt");
+    (*g).setSourceVertexByIndex(0);
     
-    bfs(g);
+    bfs(*g);
     
     string s = "1\n  2\n    5\n      6\n        9\n  4\n    7\n    8\n      3\n";
-    assert(s == g.spTreeToString()); 
+    assert(s == (*g).spTreeToString()); 
+    
+    delete g;
 }
 void Test::franciosaRemoveEdgesPointingTo_1(){
     Graph g;
@@ -191,7 +197,7 @@ void Test::graphReadWriteConsistency(){
     h.readFromFile(filename);
     for(int i = 0; i < g.n; i++) {
         assert(g.graph[i].identifier == h.graph[i].identifier);
-        assert(g.graph[i].fs_size == h.graph[i].fs_size);
+        assert(g.graph[i].fs.size() == h.graph[i].fs.size());
     }
     remove(filename);
 }

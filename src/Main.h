@@ -10,7 +10,6 @@
 #include <limits>
 #include <sstream>
 
-#include "Constants.h"
 #include "Test.h"
 #include "Graph.h"
 #include "Timer.h"

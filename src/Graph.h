@@ -10,15 +10,12 @@
 #include <queue>
 #include <cmath>
 
-#include "Constants.h"
-
 struct Vertex {
     bool marked;
     Vertex* parent;
     int identifier;
     int distance_to_source;
-    int fs_size;
-    Vertex* fs[max_vertices];
+    std::vector<Vertex*> fs;
 };
 struct Edge {
     Vertex* from;
@@ -29,10 +26,10 @@ struct Edge {
 class Graph {
     public:
         int n; //Number of vertices
-        struct Vertex graph[max_vertices];
+        struct Vertex* graph;
         
         Graph();
-        Graph(const Graph&);
+        ~Graph();
         
         void generate(std::string, float, float);
         void generateInsertions(int, std::vector<Edge>*);

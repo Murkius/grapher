@@ -6,17 +6,28 @@ Graph::Graph() {
     n = 0;
     srand((unsigned)time(0));
 }
-
-Graph::Graph(const Graph &g) {
-    n = g.n;
+Graph::~Graph(){
+    for(int i = 0; i < n; i++) {
+        graph[i].fs.clear();
+    }
     
+    sourceVertex = 0;
+    delete[] Graph::graph;
+    n = 0;
 }
 
 void Graph::generateByGnp(int n, float p) {
     Graph::n = n;
+    graph = new (nothrow) Vertex [n];
+    if(graph == 0) {
+        Graph::n = 0;
+        cout << "Error while allocating graph\n";
+        return;
+    }
     for(int i = 0; i < n; i++){
         graph[i].identifier = i;
-        graph[i].fs_size = 0;
+        graph[i].marked = false;
+        graph[i].distance_to_source = -1;
         //TODO: graph[i].bs_size = 0;
     }
     
@@ -24,7 +35,7 @@ void Graph::generateByGnp(int n, float p) {
     for(int i = 0; i < n; i++) { //from
         for(int j = 0; j < n; j++) { //to
             if(i != j && (float)rand()/(float)RAND_MAX < p) {
-                graph[i].fs[graph[i].fs_size++] = &graph[j];
+                graph[i].fs.push_back(&graph[j]);
                 m++;
             }            
         }
@@ -39,7 +50,7 @@ bool Graph::reachableFromSource() {
     while (not Q.empty()) {
         t = Q.front();
         Q.pop();
-        for (int c = 0; c < (*t).fs_size; c++) {
+        for (int c = 0; c < (*t).fs.size(); c++) {
             if (not (*(*t).fs[c]).marked) {
                 (*(*t).fs[c]).marked = true;
                 Q.push((*t).fs[c]);
@@ -83,7 +94,7 @@ void Graph::generateInsertions(int numberOfInsertions, std::vector<Edge> *insert
                 suitableEdge = false;
                 continue;
             }
-            for(int j = 0; j < graph[from].fs_size; j++) { //Atmetame briaunas kurios jau egzistuoja grafe
+            for(int j = 0; j < graph[from].fs.size(); j++) { //Atmetame briaunas kurios jau egzistuoja grafe
                 if(graph[from].fs[j] == &graph[to]) {
                     suitableEdge = false;
                     break;
@@ -110,6 +121,7 @@ void Graph::generateInsertions(int numberOfInsertions, std::vector<Edge> *insert
 void Graph::readFromFile(const char filename[]) {
     FILE *fp;
     int t;
+    int * fs_size;
 
     fp = fopen(filename, "r");
     if( fp == NULL ) {
@@ -119,24 +131,28 @@ void Graph::readFromFile(const char filename[]) {
 
     fscanf(fp, "%d", &n);
     
+    Graph::graph = new Vertex [n];
+    fs_size = new int [n];
+    
     std::vector<int> fs[n];
     
     for (int c = 0; c < n; c++) {
         graph[c].marked = false;
         graph[c].parent = 0;
         graph[c].distance_to_source = 0;
-        fscanf(fp, "%d %d", &(graph[c].identifier), &(graph[c].fs_size));
-        for(int i = 0; i < graph[c].fs_size; i++) {
+        fscanf(fp, "%d %d", &(graph[c].identifier), &fs_size[c]);
+
+        for(int i = 0; i < fs_size[c]; i++) {
             fscanf(fp, "%d", &t);
             fs[c].push_back(t);
         }
     }
     
     for (int c = 0; c < n; c++) {
-        for(int fsi = 0; fsi < graph[c].fs_size; fsi++) {
+        for(int fsi = 0; fsi < fs_size[c]; fsi++) {
             for (int c2 = 0; c2 < n; c2++) {
                 if(fs[c][fsi] == graph[c2].identifier) {
-                    graph[c].fs[fsi] = &graph[c2];
+                    graph[c].fs.push_back(&graph[c2]);
                 }
             }
         }
@@ -156,8 +172,8 @@ void Graph::saveToFile(const char filename[]) {
     fprintf(fp, "%d\n", n);
     
     for (int c = 0; c < n; c++) {
-        fprintf(fp, "%d %d", graph[c].identifier, graph[c].fs_size);
-        for(int i = 0; i < graph[c].fs_size; i++) {
+        fprintf(fp, "%d %d", graph[c].identifier, graph[c].fs.size());
+        for(int i = 0; i < graph[c].fs.size(); i++) {
             fprintf(fp, " %d", (*graph[c].fs[i]).identifier);
         }
         fprintf(fp, " \n");
@@ -226,9 +242,12 @@ string Graph::spTreeToString() {
     */
     struct Vertex* pgraph[n];
     for(int i = 0; i < n; i++) {
+        if(graph[i].parent == 0 && &graph[i] != sourceVertex) {
+            cout << "\nVirsunei " << graph[i].identifier << " nenustatyta tevine virsune!\n";
+            return "";
+        }
         pgraph[i] = &graph[i];
     }
-    
     bool brotherFound;
     int baseId;
     for(int i = 1; i < n; i++){
@@ -266,7 +285,6 @@ string Graph::spTreeToString() {
             return "";
         }
     }
-    
     ostringstream content;
     for(int i = 0; i < n; i++) {
         for(int j = 0; j < (*pgraph[i]).distance_to_source; j++) {

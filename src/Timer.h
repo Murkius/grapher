@@ -9,6 +9,7 @@ class Timer {
         Timer();
         void start();
         void stop();
+        void reset();
         double getTime();
         long getClockTime();
     private:
