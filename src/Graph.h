@@ -10,6 +10,8 @@
 #include <queue>
 #include <cmath>
 
+#include "Constants.h"
+
 struct Vertex {
     bool marked;
     Vertex* parent;
@@ -34,10 +36,10 @@ class Graph {
         void generate(std::string, float, float);
         void generateInsertions(int, std::vector<Edge>*);
         
-        void readFromFile(const char[]);
-        void saveToFile(const char[]);
-        void readUpdatesFromFile(const char[], std::vector<Edge>*);
-        void saveUpdatesToFile(const char[], std::vector<Edge>);
+        void readFromFile(std::string);
+        void saveToFile(std::string);
+        void readUpdatesFromFile(std::string, std::vector<Edge>*);
+        void saveUpdatesToFile(std::string, std::vector<Edge>);
         
         void setSourceVertexByIndex(int);
         struct Vertex* getSourceVertex();

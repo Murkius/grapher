@@ -1,6 +1,6 @@
 #if !defined(CONSTANTS_H)
-#define CONSTANTS_H 1
+#define CONSTANTS_H
 
-const int max_vertices = 200;
+const std::string BASE_PATH = "/cygdrive/c/Grapher/";
 
 #endif

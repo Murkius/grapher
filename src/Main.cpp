@@ -113,8 +113,8 @@ void franciosa_propagate(deque<Edge> d) {
 }
 void franciosa_insert(Edge e) {
     (*e.from).fs.push_back(e.to);
-    //TODO: Čia x turėtų būti įdedamas į e.to.bs
-    if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: čia turėtų būti lyginama pagal rank
+    //TODO: Ä†â€žÄ¼Ã¦Â½ia x turÄ†â€žÄ�â‚¬â€�tÄ†â€¦Ä€Â³ bÄ†â€¦Ä€Â«ti Ä†â€žÄ†â€ dedamas Ä†â€žÄ†â€  e.to.bs
+    if((*e.to).distance_to_source > (*e.from).distance_to_source + 1) { //TODO: Ä†â€žÄ€Ã˜ia turÄ†â€žÄ�â‚¬â€�tÄ†â€¦Ä€Â³ bÄ†â€¦Ä€Â«ti lyginama pagal rank
         deque<Edge> d;
         d.push_front(e);
         franciosa_propagate(d);
@@ -145,30 +145,40 @@ std::string numberedFilename(std::string prefix, int number){
 void testBfsVariants(int gn, int repeats){
     Graph *g;
     std::vector<Edge> updates;
+    Timer tx;
 
     Timer t0;
     t0.start();  
     for(int r = 1; r <= repeats; r++){
+        cout << "FP R:" << r << "  ";
         for(int k = 1; k <= gn; k++){
+            tx.reset();
+            tx.start();
             g = new Graph;
-            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k).c_str());
-            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k).c_str(), &updates);
+            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k));
+            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k), &updates);
             /* In this place we would do bfs */
             delete g;
             updates.clear();
+            tx.stop();
+            cout << " " << k << ":" << tx.getTime();
         }
+        cout << "\n";
     }
     t0.stop();
-    //cout << "Grafų paruošimas vienam kartui: " << t0.getTime() << " " << t0.getClockTime() << "\n";
+    //cout << "GrafÅ³ paruoÅ¡imas vienam kartui: " << t0.getTime() << " " << t0.getClockTime() << "\n";
 
 
     Timer t1;
     t1.start();
     for(int r = 1; r <= repeats; r++){
+        cout << "Bfs1 R:" << r << "  ";
         for(int k = 1; k <= gn; k++){
+            tx.reset();
+            tx.start();
             g = new Graph;
-            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k).c_str());
-            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k).c_str(), &updates);
+            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k));
+            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k), &updates);
 
             (*g).setSourceVertexByIndex(0);
             bfs(*g);
@@ -182,7 +192,10 @@ void testBfsVariants(int gn, int repeats){
 
             delete g;
             updates.clear();
+            tx.stop();
+            cout << " " << k << ":" << tx.getTime();
         }
+        cout << "\n";
     }
     t1.stop();
     //cout << "Bfs1 viso: " << t1.getTime() << " " << t1.getClockTime() << "\n";
@@ -191,10 +204,13 @@ void testBfsVariants(int gn, int repeats){
     Timer t2;
     t2.start();
     for(int r = 1; r <= repeats; r++){
+        cout << "Bfs2 R:" << r << "  ";
         for(int k = 1; k <= gn; k++){
+            tx.reset();
+            tx.start();
             g = new Graph;
-            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k).c_str());
-            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k).c_str(), &updates);
+            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k));
+            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k), &updates);
             (*g).setSourceVertexByIndex(0);
 
             bfs2(*g);
@@ -205,7 +221,10 @@ void testBfsVariants(int gn, int repeats){
 
             delete g;
             updates.clear();
+            tx.stop();
+            cout << " " << k << ":" << tx.getTime();
         }
+        cout << "\n";
     }
     t2.stop();
     //cout << "Bfs2 viso: " << t2.getTime() << " " << t2.getClockTime() << "\n";
@@ -214,10 +233,13 @@ void testBfsVariants(int gn, int repeats){
     Timer t3;
     t3.start();
     for(int r = 1; r <= repeats; r++){
+        cout << "Bfs3 R:" << r << "  ";
         for(int k = 1; k <= gn; k++){
+            tx.reset();
+            tx.start();
             g = new Graph;
-            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k).c_str());
-            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k).c_str(), &updates);
+            (*g).readFromFile(numberedFilename("data/bfsMarked/experiment_graph_", k));
+            (*g).readUpdatesFromFile(numberedFilename("data/bfsMarked/experiment_updates_", k), &updates);
             (*g).setSourceVertexByIndex(0);
 
             bfs3(*g);
@@ -228,22 +250,27 @@ void testBfsVariants(int gn, int repeats){
 
             delete g;
             updates.clear();
+            tx.stop();
+            cout << " " << k << ":" << tx.getTime();
         }
+        cout << "\n";
     }
     t3.stop();
     //cout << "Bfs3 viso: " << t3.getTime() << " " << t3.getClockTime() << "\n";
     //cout << "Bfs3: " << (t3.getTime()-t0.getTime()) << "\n";
 
-    cout << t0.getTime() << " | " << (t1.getTime()-t0.getTime()) << "  " << (t2.getTime()-t0.getTime()) << "  " << (t3.getTime()-t0.getTime()) << "\n";
+    cout << t0.getTime() << " | " << (t1.getTime()-t0.getTime()) << "  " << (t2.getTime()-t0.getTime()) << "  " << (t3.getTime()-t0.getTime()) << " " << time(0) << "\n";
 }
 
 int main() {
     //Test tester;
     //tester.run_tests();
 
+    cout << time(0) << "\n";
     cout << "Prep    | Bfs1     Bfs2     Bfs3\n";
     while(true){
+        cout << " --------- NEW ITERATION --------- \n";
         testBfsVariants(50, 5);
     }
-    return 2;
+    return 0;
 }

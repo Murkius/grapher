@@ -118,14 +118,16 @@ void Graph::generateInsertions(int numberOfInsertions, std::vector<Edge> *insert
     }
 }
 
-void Graph::readFromFile(const char filename[]) {
+void Graph::readFromFile(string filename) {
     FILE *fp;
     int t;
     int * fs_size;
 
-    fp = fopen(filename, "r");
+    filename = BASE_PATH+filename;
+    fp = fopen(filename.c_str(), "r");
     if( fp == NULL ) {
-        perror("Error while opening the file.\n");
+        perror("Error while opening the file ");
+        perror(filename.c_str());
         exit(EXIT_FAILURE);
     }
 
@@ -160,12 +162,14 @@ void Graph::readFromFile(const char filename[]) {
 
     fclose(fp);
 }
-void Graph::saveToFile(const char filename[]) {
+void Graph::saveToFile(string filename) {
     FILE *fp;
 
-    fp = fopen(filename, "w");
+    filename = BASE_PATH+filename;
+    fp = fopen(filename.c_str(), "w");
     if( fp == NULL ) {
-        perror("Error while opening the file.\n");
+        perror("Error while opening the file ");
+        perror(filename.c_str());
         exit(EXIT_FAILURE);
     }
     
@@ -181,15 +185,17 @@ void Graph::saveToFile(const char filename[]) {
     
     fclose(fp);
 }
-void Graph::readUpdatesFromFile(const char filename[], std::vector<Edge> *updates) {
+void Graph::readUpdatesFromFile(std::string filename, std::vector<Edge> *updates) {
     FILE *fp;
     int updatesNumber, fromId, toId;
     
     (*updates).clear();
-    
-    fp = fopen(filename, "r");
+
+    filename = BASE_PATH+filename;
+    fp = fopen(filename.c_str(), "r");
     if( fp == NULL ) {
-        perror("Error while opening the file.\n");
+        perror("Error while opening the file ");
+        perror(filename.c_str());
         exit(EXIT_FAILURE);
     }
     
@@ -211,12 +217,14 @@ void Graph::readUpdatesFromFile(const char filename[], std::vector<Edge> *update
     
     fclose(fp);
 }
-void Graph::saveUpdatesToFile(const char filename[], std::vector<Edge> updates) {
+void Graph::saveUpdatesToFile(string filename, std::vector<Edge> updates) {
     FILE *fp;
 
-    fp = fopen(filename, "w");
+    filename = BASE_PATH+filename;
+    fp = fopen(filename.c_str(), "w");
     if( fp == NULL ) {
-        perror("Error while opening the file.\n");
+        perror("Error while opening the file ");
+        perror(filename.c_str());
         exit(EXIT_FAILURE);
     }
     
