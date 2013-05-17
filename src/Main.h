@@ -9,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <fstream>
 
 #include "Test.h"
 #include "Graph.h"
