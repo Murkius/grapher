@@ -9,6 +9,7 @@
 #include <sstream>
 #include <queue>
 #include <cmath>
+#include <algorithm>
 
 #include "Constants.h"
 
@@ -32,9 +33,11 @@ class Graph {
         
         Graph();
         ~Graph();
-        
+
+        bool reachableFromSource();
         void generate(std::string, float, float);
         void generateInsertions(int, std::vector<Edge>*);
+        void generateFullFillInsertions(std::vector<Edge>*);
         
         void readFromFile(std::string);
         void saveToFile(std::string);
@@ -43,12 +46,13 @@ class Graph {
         
         void setSourceVertexByIndex(int);
         struct Vertex* getSourceVertex();
+
+        int getEdgeNumber();
         
         std::string spTreeToString();
     private:
         struct Vertex *sourceVertex;
         
-        bool reachableFromSource();
         void generateByGnp(int, float);
 };
 

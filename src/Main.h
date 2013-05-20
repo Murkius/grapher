@@ -10,6 +10,7 @@
 #include <limits>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 
 #include "Test.h"
 #include "Graph.h"

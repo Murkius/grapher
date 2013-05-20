@@ -117,6 +117,33 @@ void Graph::generateInsertions(int numberOfInsertions, std::vector<Edge> *insert
         (*insertions).push_back(e);
     }
 }
+void Graph::generateFullFillInsertions(std::vector<Edge> *insertions) {
+    int from, to;
+    bool edgeExist;
+
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if(j == i){
+                continue;
+            }
+            edgeExist = false;
+            for(int fsi = 0; fsi < graph[i].fs.size(); fsi++){
+                if(graph[i].fs[fsi] == &graph[j]){
+                    edgeExist = true;
+                    continue;
+                }
+            }
+            if(!edgeExist){
+                Edge e;
+                e.from = &graph[i];
+                e.to = &graph[j];
+                e.operation = '+';
+                (*insertions).push_back(e);
+            }
+        }
+    }
+    std::random_shuffle((*insertions).begin(), (*insertions).end());
+}
 
 void Graph::readFromFile(string filename) {
     FILE *fp;
@@ -242,6 +269,14 @@ void Graph::setSourceVertexByIndex(int i) {
 }
 struct Vertex* Graph::getSourceVertex() {
     return sourceVertex;
+}
+
+int Graph::getEdgeNumber(){
+    int en = 0;
+    for(int i = 0; i < n; i++){
+        en += graph[i].fs.size();
+    }
+    return en;
 }
 
 string Graph::spTreeToString() { 
