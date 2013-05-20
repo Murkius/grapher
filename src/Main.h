@@ -11,6 +11,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <list>
 
 #include "Test.h"
 #include "Graph.h"
